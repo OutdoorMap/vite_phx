@@ -35,37 +35,6 @@ defmodule Vite.View do
   end
 
   @doc """
-  The complete snippet for a single entry-point during prod. Delegates to vite dev-server otherwise. See `:for_entry` for details.
-  """
-  @spec vite_js_snippet(binary()) :: binary() | {:safe, binary()}
-  def vite_js_snippet(entry_name) do
-    case Config.current_env() do
-      :prod ->
-        Vite.Manifest.entry(entry_name) |> for_entry(:module) |> as_safe()
-
-      _ ->
-        ~s(<script type="module" src="#{Config.dev_server_address()}/#{entry_name}"></script>)
-        |> as_safe()
-    end
-  end
-
-
-  @doc """
-  The complete snippet for a single entry-point during prod. Delegates to vite dev-server otherwise. See `:for_entry` for details.
-  """
-  @spec vite_css_snippet(binary()) :: binary() | {:safe, binary()}
-  def vite_css_snippet(entry_name) do
-    case Config.current_env() do
-      :prod ->
-        Vite.Manifest.entry(entry_name) |> for_entry(:css) |> as_safe()
-
-      _ ->
-        ~s(<script type="module" src="#{Config.dev_server_address()}/#{entry_name}"></script>)
-        |> as_safe()
-    end
-  end
-
-  @doc """
   Generate all links for an entry struct in following order:
 
     1. styles to prevent FOUC
@@ -92,7 +61,11 @@ defmodule Vite.View do
   end
 
   defp handle({:module, file}, prefix) do
-    module_script(file, prefix)
+    if Path.extname(file) |> String.contains?("css") do
+      css_link(file, prefix)
+    else
+      module_script(file, prefix)
+    end
   end
 
   defp handle({:import_module, file}, prefix) do
