@@ -7,6 +7,8 @@ defmodule Vite do
 
   defdelegate vite_client, to: View
   defdelegate vite_snippet(entry_name), to: View
+  defdelegate vite_js_snippet(entry_name), to: View
+  defdelegate vite_css_snippet(entry_name), to: View
   defdelegate inlined_phx_manifest, to: View
   defdelegate react_refresh_snippet, to: React
 
